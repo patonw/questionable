@@ -23,10 +23,7 @@ from flask import Flask, render_template, request
 
 # In[2]:
 # Please run the notebook "Questionable - Part 2" to generate this cache
-SQUAD_URL = "https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v2.0.json"
-SQUAD_TRAIN = "data/train-v2.0.json"
-LEMMA_CACHE = "cache/lemmas.feather"
-VECTOR_CACHE = "cache/vectors.pickle"
+from constants import *
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 n_candidates = 10 if device.type == 'cuda' else 5
