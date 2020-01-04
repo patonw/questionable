@@ -4,7 +4,7 @@
 # In[1]:
 
 import os
-from flask import Flask, render_template, request
+import pickle
 import random
 import json
 import numpy as np
@@ -19,9 +19,14 @@ from transformers import *
 import spacy
 from tqdm import tqdm
 
+from flask import Flask, render_template, request
+
 # In[2]:
 # Please run the notebook "Questionable - Part 2" to generate this cache
-LEMMA_CACHE = "squad_context.feather"
+SQUAD_URL = "https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v2.0.json"
+SQUAD_TRAIN = "data/train-v2.0.json"
+LEMMA_CACHE = "cache/lemmas.feather"
+VECTOR_CACHE = "cache/vectors.pickle"
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 n_candidates = 10 if device.type == 'cuda' else 5
@@ -61,19 +66,26 @@ N = df.shape[0]
 
 # In[9]:
 
-print("Indexing source texts")
 
-vectorizer = TfidfVectorizer(
-    stop_words='english', min_df=5, max_df=.5, ngram_range=(1,3))
-tf_idf = vectorizer.fit_transform(tqdm(lemmas))
-
+if not os.path.isfile(VECTOR_CACHE):
+    print("Indexing source texts")
+    vectorizer = TfidfVectorizer(
+        stop_words='english', min_df=5, max_df=.5, ngram_range=(1,3))
+    tfidf = vectorizer.fit_transform(lemmas)
+    with open(VECTOR_CACHE, "wb") as f:
+        pickle.dump(dict(vectorizer=vectorizer, tfidf=tfidf), f)
+else:
+    with open(VECTOR_CACHE, "rb") as f:
+        cache = pickle.load(f)
+        tfidf = cache["tfidf"]
+        vectorizer = cache["vectorizer"]
 
 # In[11]:
 
 
 def fetch_contexts(question, THRESH = 0.01, debug=False):
     query = vectorizer.transform([lemmatize(question)])
-    scores = (tf_idf * query.T).toarray()
+    scores = (tfidf * query.T).toarray()
     results = (np.flip(np.argsort(scores, axis=0)))
     candidate_idxs = [(i, scores[i]) for i in results[0:n_candidates, 0]]
     contexts = [(paragraphs[i],s) for (i,s) in candidate_idxs if s > THRESH]
