@@ -3,7 +3,7 @@
 import os
 from constants import *
 
-os.system("pip install flask torch transformers sklearn pyarrow seaborn spacy[cuda100]")
+os.system("jupyter nbextension enable --py widgetsnbextension")
 os.system("python -m spacy download en_core_web_sm")
 
 if not os.path.isdir("data"):

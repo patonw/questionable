@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flask = "*"
+torch = "*"
+transformers = "*"
+sklearn = "*"
+pyarrow = "*"
+seaborn = "*"
+notebook = "*"
+jupyter-contrib-nbextensions = "*"
+spacy = {extras = ["cuda92"],version = "*"}
+ipywidgets = "*"
+unidecode = "*"
+
+[requires]
+python_version = "3.7"
