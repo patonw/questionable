@@ -3,11 +3,10 @@
 import os
 import multiprocessing as mp
 import requests
-
-from constants import *
 from tqdm import tqdm
-
 from transformers import *
+
+from qa.constants import *
 
 os.system("jupyter nbextension enable --py widgetsnbextension")
 os.system("python3 -m spacy download en_core_web_sm")

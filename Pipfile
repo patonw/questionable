@@ -17,6 +17,7 @@ jupyter-contrib-nbextensions = "*"
 spacy = {extras = ["cuda92"],version = "*"}
 ipywidgets = "*"
 unidecode = "*"
+nmslib = "*"
 
 [requires]
 python_version = "3.7"

@@ -10,7 +10,7 @@ case $action in
 	"bootstrap")
 		python3 init_container.py
 		python3 update_index.py
-		python3 questionable.py
+		python3 serve.py
 		;;
 	"prepare")
 		python3 init_container.py $@
@@ -19,7 +19,7 @@ case $action in
 		python3 update_index.py $@
 		;;
 	"serve")
-		python3 questionable.py $@
+		python3 serve.py $@
 		;;
 	*)
 		cat HELP.md
