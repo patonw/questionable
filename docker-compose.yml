@@ -1,0 +1,16 @@
+version: '2.4'
+services:
+  questionable:
+    runtime: nvidia
+    image: "questionable:latest"
+    build: .
+    cpus: 4.0
+    ports:
+      - "8765:8765"
+    volumes:
+      - data:/data
+      - cache:/cache
+
+volumes:
+  data: {}
+  cache: {}
