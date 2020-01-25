@@ -2,16 +2,31 @@
 
 import spacy
 from flask import Flask, request
+from transformers import *
 
+from qa.embedders import *
 from qa.indexers import *
 from qa.questionable import *
 from qa.context_source import *
 
-app = Flask(__name__)
 sp = spacy.load('en_core_web_sm')
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertForQuestionAnswering \
+        .from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad') \
+        .to(DEVICE)
+
 contexts = ContextSource.from_cache(sp)
-indexer = CompositeIndexer(sp, contexts.docs)
-am = AnsweringMachine(contexts.docs)
+docs = contexts.docs
+terms = TfIdfIndexer.from_cache(sp)
+ents = EntityIndexer(terms.scorer, sp=sp, docs=docs, exclude=terms.get_vocab())
+embedder = BertEmbedder(tokenizer, model)
+embidx = EmbeddingIndexer(sp, embedder)
+embidx.build_index(docs)
+
+indexer = CompositeIndexer(sp, contexts.docs, dict(ENTITY=ents, TFIDF=terms, EMBED=embidx))
+am = AnsweringMachine(contexts.docs, tokenizer, model)
+
+app = Flask(__name__)
 
 @app.route('/')
 def display():
@@ -23,9 +38,6 @@ def answer():
     if not question:
         return "Query parameter 'q' is required\n", 400
     
-    #contexts, query = indexer.fetch_contexts(question, debug=True)
-    #if len(query) < 1 or query[0].size < 1:
-    #    return "Ask a better question\n", 400
     contexts = indexer.fetch_contexts(question)
         
     if len(contexts) < 1:

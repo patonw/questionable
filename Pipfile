@@ -18,6 +18,7 @@ spacy = {extras = ["cuda92"],version = "*"}
 ipywidgets = "*"
 unidecode = "*"
 nmslib = "*"
+torchtext = "*"
 
 [requires]
 python_version = "3.7"
